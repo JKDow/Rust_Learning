@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "digi_safe"
+		},
+		{
+			"path": "advent_1_calorie_counter"
 		}
 	],
 	"settings": {}
