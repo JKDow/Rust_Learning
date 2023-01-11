@@ -7,7 +7,9 @@ Created: 11/1/2023
 Last updated: 11/1/2023 
 */
 
-use std::fs;
+
+use std::io::{BufRead, BufReader};
+use std::fs::File;
 
 fn main() {
     println!("Starting Main");
@@ -16,36 +18,35 @@ fn main() {
     let path = "input.txt";
     println!("Path: {}", path);
 
-    let contents = fs::read_to_string(path)
-        .expect("Error reading input file"); 
+    let data = File::open(path).expect("Failed to open input file"); 
+    let reader = BufReader::new(data); 
+
+    let mut current_elf_count = 0; 
+    let mut max_elf_count = 0 ;
+
+    let mut i = 0; 
+    let mut max_i = 0; 
     
-    //println!("{}",contents); 
-
-    let mut current_line = String::new(); 
-    let mut marker: bool = false; 
-    let current_elf: Vec<i32> = Vec::new();
-    let all_elfs: Vec<i32> = Vec::new();
-
-    for i in contents.chars() {
-        match i {
-            '0'..='9' => {
-                current_line.push(i);
-                println!("{}",i); 
-            }
-            '\n' => {
-                if marker {
-                
+    for line in reader.lines() {
+        let l = line.expect("Couldn't read line");
+        let num: u32 = match l.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                //println!("Not a number"); 
+                i += 1; 
+                if current_elf_count > max_elf_count {
+                    max_elf_count = current_elf_count;
+                    max_i = i;
                 }
-                else {
-                    marker = true;
-                }
+                current_elf_count = 0;
+                continue; 
             }
-            _ => {
-                println!("Invalid character: {}", i);
-                return; 
-            }
-        }
+        };
+        current_elf_count += num; 
+        //println!("{}", l);
     }
 
+    println!("Max Elf Count: {}", max_elf_count);
+    println!("Max I: {}", max_i);
 }
   
