@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "advent_1_calorie_counter"
+		},
+		{
+			"path": "advent_2_RPC"
 		}
 	],
 	"settings": {}
