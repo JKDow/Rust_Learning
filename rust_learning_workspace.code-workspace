@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "advent_2_RPC"
+		},
+		{
+			"path": "advent_2_rpc_2"
 		}
 	],
 	"settings": {}
