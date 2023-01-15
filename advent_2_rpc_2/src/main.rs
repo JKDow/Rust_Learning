@@ -10,6 +10,7 @@ Last updated: 13/1/2023
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
+use std::time::Instant;
 
 struct Move {
     points: u32,
@@ -29,6 +30,7 @@ impl Move {
 
 fn main() {
     println!("Starting Main");
+    let start = Instant::now();
 
     let mut str_to_move = HashMap::new();
     str_to_move.insert("A".to_string(), Move::new(1, "C", "B")); // A = rock
@@ -64,4 +66,7 @@ fn main() {
     }
 
     println!("Total Points: {}", points);
+
+    let duration = start.elapsed();
+    println!("Time elapsed is: {:?}", duration);
 }
