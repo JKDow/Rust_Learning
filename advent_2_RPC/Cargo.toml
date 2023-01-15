@@ -1,5 +1,5 @@
 [package]
-name = "advent_2_RPC"
+name = "advent_2_rpc"
 version = "0.1.0"
 edition = "2021"
 
