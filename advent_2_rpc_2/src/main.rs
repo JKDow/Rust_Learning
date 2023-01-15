@@ -4,7 +4,7 @@ https://adventofcode.com/2022/day/2
 
 Author: Josh Dowling
 Created: 13/1/2023
-Last updated: 13/1/2023 
+Last updated: 15/1/2023 
 */
 
 use std::io::{BufRead, BufReader};

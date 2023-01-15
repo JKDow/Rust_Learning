@@ -14,6 +14,9 @@
 		},
 		{
 			"path": "advent_2_rpc_2"
+		},
+		{
+			"path": "advent_3_rucksack"
 		}
 	],
 	"settings": {}
