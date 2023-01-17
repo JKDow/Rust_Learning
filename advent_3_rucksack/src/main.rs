@@ -10,9 +10,11 @@ Last updated: 15/1/2023
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashSet;
+use std::time::Instant;
 
 fn main() {
     println!("Starting Main");
+    let start = Instant::now();
     
     let priorities = String::from("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); 
     let priorities: Vec<char> = priorities.chars().collect(); 
@@ -63,6 +65,9 @@ fn main() {
         }
     }
     println!("Total: {}", total_sum); 
+
+    let duration = start.elapsed();
+    println!("Time elapsed is: {:?}", duration);
 }
 
 //7682 too low
