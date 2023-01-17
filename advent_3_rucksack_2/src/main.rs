@@ -28,7 +28,7 @@ fn main() {
 
     let mut counter = 0; 
     let mut compare_data: Vec<char> = Vec::new(); 
-    // Read 3 lines into vector of strings
+    // Read 3 lines into vector or string
     for line in reader.lines() {
         let line = line.expect("Could not read line");
         if counter == 0 {
@@ -60,6 +60,8 @@ fn main() {
     println!("Time elapsed is: {:?}", duration);
 }
 
+// Takes in a vector of characters and a string 
+// Returns a vector of matching characters between them
 fn comp(set1: &Vec<char>, set2: &str) -> Vec<char> {
     let mut data: Vec<char> = Vec::new();
     for item in set1.iter() {
