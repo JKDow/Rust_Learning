@@ -1,5 +1,5 @@
 /*
-Rock paper scissors challenge part 3 from: 
+Rucksack challenge part 1 from: 
 https://adventofcode.com/2022/day/3
 
 Author: Josh Dowling
