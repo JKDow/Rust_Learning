@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "advent_4_cleaning"
+		},
+		{
+			"path": "advent_5_crates"
 		}
 	],
 	"settings": {}
