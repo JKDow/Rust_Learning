@@ -9,6 +9,7 @@ Last updated: 18/1/2023
 
 use std::io::BufRead;
 use advent_5_crates::*; 
+
 fn main() {
     let _timer = program_timer::BenchMarker::new();
     let reader = read_file("input.txt");
@@ -26,9 +27,10 @@ fn main() {
                 panic!("Could not read line"); 
             }
         };
-
-        let line_vector: Vec<char> = line.chars().collect(                  ); 
+        // populate crates vectors
+        //println!("Counter: {}", line_counter);
         if line_counter < 10 {
+            let line_vector: Vec<char> = line.chars().collect(); 
             for i in 0..=8 {
                 if line_vector[i*4] == '[' {
                     crates[i].push(line_vector[(i*4)+1]); 
@@ -37,28 +39,45 @@ fn main() {
             continue; 
         } else if line_counter == 10 {
             //reverse vectors
-            for i in 0..8 {
+            println!("Stack start: {:?}", crates);
+            for i in 0..=8 {
                 crates[i].reverse();
             }
+            println!("Reversed: {:?}", crates);
+            continue; 
+        }
+        // get instructions
+        let mut instruction: [u32; 3] = [0,0,0];  
+        let mut counter = 0;
+        for block in line.split_whitespace(){
+            match block.parse::<u32>() {
+                Ok(num) => {
+                    instruction[counter] = num;
+                    counter += 1; 
+                },
+                Err(_) => {continue;},
+            };
+        }
+        //execute instruction
+        //println!("Stack {}: {:?}",line_counter, crates);
+        //println!("Instruction: {:?}", instruction);
+        println!("");
+        for _i in 0..instruction[0] {
+            let temp: char = match crates[(instruction[1]-1) as usize].pop() {
+                Some(temp) => temp,
+                None => {
+                   panic!("Invalid instruction: {}", line_counter);
+                }
+            };
+            crates[(instruction[2]-1) as usize].push(temp);
         }
     }
-
-    println!("Array: {:?}", crates);
-    
+    println!("Stack fished: {:?}", crates);
 }
 
-fn reverse_vector(mut input_vector: Vec<char>) -> Vec<char> {
-    let mut temp_vector: Vec<char> = Vec::new(); 
-    for _i in input_vector.clone() {
-        temp_vector.push(
-            match input_vector.pop() {
-                Some(c) => c,
-                None => {
-                    println!("Could not pop"); 
-                    return temp_vector; 
-                }
-            }
-        ); 
-    }
-    temp_vector
-}
+/*Wrong: 
+CNTCFZSJH
+CNZLFZSJH
+*/
+
+// RNZLFZSJH
