@@ -7,7 +7,6 @@ Created: 3/1/2023
 Last updated: 10/1/2023 
 */
 
-
 use std::io; //Define namespace?
 use rand::Rng; //Maybe these are more like including libraries 
 use std::cmp::Ordering; 
