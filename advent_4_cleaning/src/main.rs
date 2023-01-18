@@ -13,6 +13,7 @@ fn main() {
     let _timer = program_timer::BenchMarker::new();
     let reader = read_file("input.txt");
     let mut total_contains = 0; 
+    let mut total_overlap = 0; 
 
     for line in reader.lines() {
         let line = match line {
@@ -52,6 +53,13 @@ fn main() {
         else { //min of each range is equal
             total_contains += 1;
         }
+
+        // Overlapping ranges 
+        if (parts[2] <= parts[1]) && (parts[0] <= parts[3]) {
+            total_overlap += 1; 
+        } 
     }
     println!("Total sets containing another: {}", total_contains);
+    println!("Total overlaps: {}", total_overlap)
+
 }
