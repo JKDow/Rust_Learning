@@ -26,6 +26,9 @@
 		},
 		{
 			"path": "advent_5_crates"
+		},
+		{
+			"path": "advent_5_crates_2"
 		}
 	],
 	"settings": {}
