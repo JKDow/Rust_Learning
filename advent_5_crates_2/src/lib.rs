@@ -42,39 +42,7 @@ pub mod program_timer {
     }
 }
 
-pub mod crates {
-    struct Instruction {
-        number_of_crates: usize,
-        from_stack: usize,
-        to_stack: usize,
-        carry_one_at_time: bool, 
-    }
-    
-    struct Crates {
-        stacks: Vec<Vec<char>>,
-    }
-
-    pub fn run_part_2(path: &str) -> Result<&str, &str>{
+pub mod part_2;
 
 
-        Ok("MCD")
-    }
-}
 
-#[cfg(test)]
-mod tests {
-    use crate::crates::run_part_2;
-
-    //use super::*;
-
-    #[test]
-    fn runs_part_2() {
-        match run_part_2("input.txt") {
-            Ok(v) => {
-                assert_eq!("MCD", v);
-                v
-            }
-            Err(e) => panic!("{}", e) 
-        };
-    }
-}
