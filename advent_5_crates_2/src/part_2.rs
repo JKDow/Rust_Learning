@@ -79,22 +79,32 @@ impl Crates {
     }
 
     fn run_instruction(&mut self, instruction: &Instruction) {
-
+        let mut temp: Vec<char> = Vec::new();
+        for _ in 0..instruction.number_of_crates {
+            temp.push(
+                self.stacks[instruction.from_stack - 1]
+                .pop().unwrap());
+        }
+        for _ in 0..temp.len() {
+            self.stacks[instruction.to_stack - 1]
+            .push(temp.pop().unwrap());
+        }
     }
 
-    fn get_top_crates(&self) -> String {
-
-        String::from("")
+    fn get_top_crates(self) -> String {
+        let mut output = String::from("");
+        for stack in self.stacks {
+            output.push(*stack.last().unwrap());
+        }
+        output
     }
 
 }
 
-pub fn run_part_2(path: &str) -> Result<&str, &str>{
+pub fn run_part_2(path: &str) -> Result<String, &str>{
     let data = read_file_str(path);
 
     let mut crates = Crates::new(&data);
-
-    println!("Crates: {:?}", crates);
 
     let instruction_strings = data
         .split("\r\n\r\n")
@@ -103,12 +113,8 @@ pub fn run_part_2(path: &str) -> Result<&str, &str>{
     for line in instruction_strings {
         let instruction = Instruction::new(line);
         crates.run_instruction(&instruction);
-        println!("Instruction: {:?}", instruction);
     }
-    
-    
-    
-    Ok("MCD")
+    Ok(crates.get_top_crates())
 }
 
 
@@ -122,12 +128,28 @@ mod tests {
 
     #[test]
     fn runs_part_2() {
-        match run_part_2("input.txt") {
+        match run_part_2("input_test.txt") {
             Ok(v) => {
                 assert_eq!("MCD", v);
                 v
             }
             Err(e) => panic!("{}", e) 
         };
+    }
+
+    #[test]
+    fn get_starting_top_test_data() {
+        let data = read_file_str("input_test.txt");
+        let crates = Crates::new(&data);
+        let tops = crates.get_top_crates();
+        assert_eq!(tops, "NDP")
+    }
+
+    #[test]
+    fn get_starting_top() {
+        let data = read_file_str("input.txt");
+        let crates = Crates::new(&data);
+        let tops = crates.get_top_crates();
+        assert_eq!(tops, "SRSJBTQRT");
     }
 }

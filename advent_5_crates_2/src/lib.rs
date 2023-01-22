@@ -24,12 +24,16 @@ pub mod program_timer {
     use std::time::Instant;
     pub struct BenchMarker {
         start: Instant,
+        name: String,
     }
     
     impl BenchMarker {
-        pub fn new() -> BenchMarker {
-            println!("Starting Program Main");
-            let bench = BenchMarker{start: Instant::now()};
+        pub fn new(name: &str) -> BenchMarker {
+            println!("Starting function: Main");
+            let bench = BenchMarker{
+                start: Instant::now(),
+                name: String::from(name)
+            };
             return bench; 
         }
     }
@@ -37,7 +41,7 @@ pub mod program_timer {
     impl Drop for BenchMarker {
         fn drop(&mut self) {
             let duration = self.start.elapsed();
-            println!("Ending main after: {:?}", duration)
+            println!("Ending {} after: {:?}", self.name, duration)
         }
     }
 }
