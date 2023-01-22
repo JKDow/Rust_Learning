@@ -4,7 +4,7 @@ https://adventofcode.com/2022/day/6
 
 Author: Josh Dowling
 Created: 22/1/2023
-Last updated: 22/1/2023 
+Last updated: 23/1/2023 
 */
 
 use advent_6::*;
