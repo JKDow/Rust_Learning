@@ -28,7 +28,7 @@ pub fn run(path: &str) -> usize {
             } else if duplicate_pos > current_pos { //Check countdown logic
                 expected_countdown = duplicate_pos - current_pos;
             } else {
-                expected_countdown = current_pos - duplicate_pos; 
+                expected_countdown = (4 - current_pos) + duplicate_pos; 
             }
             if expected_countdown > countdown {
                 countdown = expected_countdown;
@@ -42,3 +42,13 @@ pub fn run(path: &str) -> usize {
 }
 
 // Doesnt check for existing duplicates 
+
+#[cfg(test)] 
+mod tests {
+    use super::*;
+
+    #[test]
+    fn data_1() {
+        
+    }
+}
