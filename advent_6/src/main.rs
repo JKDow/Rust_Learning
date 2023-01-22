@@ -11,5 +11,5 @@ use advent_6::*;
 
 fn main() {
     let _timer = program_timer::BenchMarker::new("Main");
-    println!("Part 1: {}", part_1::run("input.txt"))
+    println!("Part 2: {}", part_2::run("input.txt"))
 }
