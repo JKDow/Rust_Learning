@@ -1,0 +1,79 @@
+use crate::read_file_str;
+use std::{collections::HashMap, cell::RefCell, rc::Rc};
+
+
+struct Directory {
+    name: String,
+    parent: Option<Rc<RefCell<Directory>>>,
+    children: HashMap<String, Rc<RefCell<Directory>>>,
+    files: HashMap<String, u32>,
+    total_size: u32,
+}
+
+impl Directory {
+    fn new(name: String, parent: Option<Rc<RefCell<Directory>>>) -> Self {
+        let dir = Directory {
+            name: name,
+            parent: parent,
+            children: HashMap::new(),
+            files: HashMap::new(),
+            total_size: 0, //will get updated when the search is done
+        };
+        return dir
+    }
+
+    fn add_child(&mut self, name: String) {
+        //check if it exists
+        if self.children.contains_key(&name) {
+            return;
+        }
+        //if not then make it
+        self.children.insert(name, Directory::new(name, Some(self)));
+    }
+
+    fn add_file(&mut self, name: String, size: u32) {
+        //check if it exists
+        if self.files.contains_key(&name) {
+            return;
+        }
+        //if not then make it
+        self.files.insert(name, size);
+    }
+}
+
+pub fn run(path: &str) -> usize {
+
+    let mut current_dir = Directory::new(String::from("/"), None);
+
+    let data = read_file_str(path);
+    for line in data.lines().skip(1) {
+        let slice = &line[..4];
+        println!("{}", slice);
+        if slice == "$ cd" {
+
+        } else if slice == "$ ls" {
+            continue; 
+        } else if slice == "dir " {
+            let name = line.split_whitespace().nth(1).unwrap();
+            current_dir.add_child(String::from(name));
+        } else {
+            let vec: Vec<&str> = line.split_whitespace().collect();
+            current_dir.add_file(String::from(vec[0]), vec[1].parse().unwrap());
+        }
+    }
+
+    return 0
+}
+
+
+
+#[cfg(test)] 
+mod tests {
+    use super::*;
+
+    #[test]
+    fn data_1() {
+        let result = run("input_test.txt");
+        assert_eq!(result, 95437)
+    }
+}
