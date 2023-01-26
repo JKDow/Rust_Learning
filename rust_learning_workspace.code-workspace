@@ -32,6 +32,9 @@
 		},
 		{
 			"path": "advent_7"
+		},
+		{
+			"path": "advent_8"
 		}
 	],
 	"settings": {}
