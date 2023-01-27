@@ -1,14 +1,13 @@
 use crate::read_file_str;
+use std::collections::HashMap;
 
+#[derive(Eq, Hash, PartialEq)]
 enum Side {Left, Right, Top, Bottom}
 
 struct Forrest {
     heights: Vec<Vec<u32>>,
     viewable: Vec<Vec<bool>>,
-    left_max: Vec<u32>,
-    right_max: Vec<u32>,
-    top_max: Vec<u32>,
-    bottom_max: Vec<u32>,
+    max: HashMap<Side, Vec<u32>>,
     data_size: usize,
 }
 
@@ -26,27 +25,63 @@ impl Forrest {
             )
             .collect();
         let size = data.len();
-        Forrest {
+        let mut forrest = Forrest {
             heights: data,
             viewable: vec![vec![false; size]; size],
-            left_max: vec![0; size],
-            right_max: vec![0; size],
-            top_max: vec![0; size],
-            bottom_max: vec![0; size],
+            max: HashMap::new(),
             data_size: size,
-        }
+        };
+        forrest.max.insert(Side::Left, vec![0; size]);
+        forrest.max.insert(Side::Right, vec![0; size]);
+        forrest.max.insert(Side::Top, vec![0; size]);
+        forrest.max.insert(Side::Bottom, vec![0; size]);
+
+        return forrest
     }
 
     fn is_viewable(&mut self, row: usize, column: usize, side: Side) -> bool {
-        let mut max = match side {
-            Side::Left => self.left_max[row],
-            Side::Right => self.right_max[row],
-            Side::Top => self.top_max[column],
-            Side::Bottom => self.bottom_max[column],
+        let mut max = self.max.remove(&side).unwrap();
+
+        let max_index = match side {
+            Side::Left => row,
+            Side::Right => row,
+            Side::Top => column,
+            Side::Bottom => column,
         };
-        self.check_viewable(row, column, &mut max)
+
+        if self.heights[row][column] > max[max_index] {
+            max[max_index] = self.heights[row][column];
+            if self.viewable[row][column] == true {
+                self.max.insert(side, max);
+                return false; 
+            }
+            self.viewable[row][column] = true;
+            self.max.insert(side, max);
+            return true;
+        }
+        if row == 0 || column == 0 || row == self.data_size-1 || column == self.data_size-1 {
+            if self.viewable[row][column] == true {
+                self.max.insert(side, max);
+                return false; 
+            }
+            self.viewable[row][column] = true;
+            self.max.insert(side, max);
+            return true;
+        }
+        self.max.insert(side, max);
+        return false;
     }
 
+    /*fn is_viewable(&mut self, row: usize, column: usize, side: Side) -> bool {
+        let &mut max = match side {
+            Side::Left => &mut self.left_max[row],
+            Side::Right => &mut self.right_max[row],
+            Side::Top => &mut self.top_max[column],
+            Side::Bottom => &mut self.bottom_max[column],
+        };
+        self.check_viewable(row, column, max)
+    }
+    */
     fn check_viewable(&mut self, row: usize, column: usize, max: &mut u32) -> bool {
         if self.heights[row][column] > *max {
             *max = self.heights[row][column];

@@ -11,5 +11,5 @@ use advent_8::*;
 
 fn main() {
     let _timer = program_timer::BenchMarker::new("Main");
-    println!("Part 1: {}", part_1::run("input_test.txt"));
+    println!("Part 1: {}", part_1::run("input.txt"));
 }
