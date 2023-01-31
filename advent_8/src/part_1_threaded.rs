@@ -99,9 +99,9 @@ pub fn run(input_path: &str) -> u32 {
         }
         main_tx.send(viewable_counter).unwrap();
     });
-    
-    let config = threads::SearchThreadConfig::new(viewable_left_tx, left_rx, Direction::Left);
-    threads::search_side(config);
+
+    //let config = threads::SearchThreadConfig::new(viewable_left_tx, left_rx, Direction::Left);
+    threads::search_side(SearchThreadConfig{tx: viewable_left_tx, rx: left_rx, side: Direction::Left});
 
     thread::spawn(move || {
         loop {

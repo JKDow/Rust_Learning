@@ -31,9 +31,9 @@ impl ViewableMsg {
 }
 
 pub struct SearchThreadConfig {
-    tx: mpsc::Sender<ViewableMsg>,
-    rx: mpsc::Receiver<Option<Vec<u32>>>, 
-    side: Direction,
+    pub tx: mpsc::Sender<ViewableMsg>,
+    pub rx: mpsc::Receiver<Option<Vec<u32>>>, 
+    pub side: Direction,
 }
 
 impl SearchThreadConfig {
@@ -44,15 +44,17 @@ impl SearchThreadConfig {
 
 pub fn search_side(config: SearchThreadConfig) {
     let handle = thread::spawn(move || {
+        println!("Starting Thread");
+        let rx = config.rx;
         loop {
-            let msg = match config.rx.recv().unwrap() {
+            let msg = match rx.recv().unwrap() {
                 None => {
-                    
                     config.tx.send(ViewableMsg::finished_msg(config.side.clone())).unwrap();
                     break;
                 }
                 Some(msg) => msg,
             };
+            println!("Received message: {:?}", msg);
             let mut set = ViewableMsg::new(config.side.clone(), msg.len());
             let index = match config.side {
                 Direction::Left | Direction::Top => 0,
@@ -72,4 +74,5 @@ pub fn search_side(config: SearchThreadConfig) {
         }
     });
     handle.join().unwrap();
+    println!("Ended Thread");
 }
