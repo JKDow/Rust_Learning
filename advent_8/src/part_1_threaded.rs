@@ -2,35 +2,9 @@ use crate::read_file_str;
 use std::thread;
 use std::sync::mpsc;
 
-enum Direction {Left, Right, Top, Bottom}
+pub mod threads;
 
-struct ViewableMsg {
-    data: Vec<bool>,
-    direction: Direction,
-    length: usize,
-    finished: bool,
-    raw: Vec<u32>,
-}
-
-impl ViewableMsg {
-    fn new(direction: Direction, length: usize) -> ViewableMsg {
-        ViewableMsg {
-            data: vec![false; length],
-            direction: direction,
-            length: length,
-            finished: false,
-            raw: vec![],
-        }
-    }
-
-    fn length_msg(length: usize) -> ViewableMsg {
-        ViewableMsg { data: vec![], direction: Direction::Left, length: length, finished: false, raw: vec![]}
-    }
-
-    fn finished_msg(direction: Direction) -> ViewableMsg {
-        ViewableMsg { data: vec![], direction: direction, length: 0, finished: true, raw: vec![]}
-    }
-}
+use threads::*;
 
 pub fn run(input_path: &str) -> u32 {
     let (viewable_tx, viewable_rx) = mpsc::channel::<ViewableMsg>();
@@ -44,7 +18,7 @@ pub fn run(input_path: &str) -> u32 {
     let (bottom_tx, bottom_rx) = mpsc::channel::<Option<Vec<u32>>>();
     let (main_tx, main_rx) = mpsc::channel::<u32>();
 
-    let viewable_handle = thread::spawn(move || {
+    thread::spawn(move || {
         let mut left = true;
         let mut right = true;
         let mut top = true;
@@ -125,32 +99,11 @@ pub fn run(input_path: &str) -> u32 {
         }
         main_tx.send(viewable_counter).unwrap();
     });
-    let left_handle = thread::spawn(move || {
-        loop {
-            let msg = match left_rx.recv().unwrap() {
-                None => {
-                    //msg viewable none and break
-                    viewable_left_tx.send(ViewableMsg::finished_msg(Direction::Left)).unwrap();
-                    break;
-                }
-                Some(msg) => msg,
-            };
-            let mut set = ViewableMsg::new(Direction::Left, msg.len());
-            let mut max = msg[0];
-            set.data[0] = true;
-            let mut counter = 1;
-            for element in msg.iter().skip(1) {
-                if *element > max {
-                    max = *element;
-                    set.data[counter] = true;
-                }
-                counter += 1;
-            }
-            set.raw = msg;
-            viewable_left_tx.send(set).unwrap();
-        }
-    });
-    let right_handle = thread::spawn(move || {
+    
+    let config = threads::SearchThreadConfig::new(viewable_left_tx, left_rx, Direction::Left);
+    threads::search_side(config);
+
+    thread::spawn(move || {
         loop {
             let msg = match right_rx.recv().unwrap() {
                 None => {
@@ -171,11 +124,10 @@ pub fn run(input_path: &str) -> u32 {
                 }
                 counter += 1;
             }
-            set.raw = msg;
             viewable_right_tx.send(set).unwrap();
         }
     });
-    let top_handle = thread::spawn(move || {
+    thread::spawn(move || {
         loop {
             let msg = match top_rx.recv().unwrap() {
                 None => {
@@ -196,11 +148,10 @@ pub fn run(input_path: &str) -> u32 {
                 }
                 counter += 1;
             }
-            set.raw = msg;
             viewable_top_tx.send(set).unwrap();
         }
     });
-    let bottom_handle = thread::spawn(move || {
+    thread::spawn(move || {
         loop {
             let msg = match bottom_rx.recv().unwrap() {
                 None => {
@@ -221,7 +172,6 @@ pub fn run(input_path: &str) -> u32 {
                 }
                 counter += 1;
             }
-            set.raw = msg;
             viewable_bottom_tx.send(set).unwrap();
         }
     });
@@ -257,12 +207,6 @@ pub fn run(input_path: &str) -> u32 {
     bottom_tx.send(None).unwrap();
 
     let viewable_counter = main_rx.recv().unwrap();
-    
-    viewable_handle.join().unwrap();
-    left_handle.join().unwrap();
-    right_handle.join().unwrap();
-    top_handle.join().unwrap();
-    bottom_handle.join().unwrap();
 
     return viewable_counter;
 }
