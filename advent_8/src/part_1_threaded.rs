@@ -100,80 +100,17 @@ pub fn run(input_path: &str) -> u32 {
         main_tx.send(viewable_counter).unwrap();
     });
 
-    //let config = threads::SearchThreadConfig::new(viewable_left_tx, left_rx, Direction::Left);
-    threads::search_side(SearchThreadConfig{tx: viewable_left_tx, rx: left_rx, side: Direction::Left});
-
     thread::spawn(move || {
-        loop {
-            let msg = match right_rx.recv().unwrap() {
-                None => {
-                    //msg viewable none and break
-                    viewable_right_tx.send(ViewableMsg::finished_msg(Direction::Right)).unwrap();
-                    break;
-                }
-                Some(msg) => msg,
-            };
-            let mut set = ViewableMsg::new(Direction::Right, msg.len());
-            let mut max = msg[msg.len() - 1];
-            set.data[msg.len() - 1] = true;
-            let mut counter = 1;
-            for element in msg.iter().rev().skip(1) {
-                if *element > max {
-                    max = *element;
-                    set.data[msg.len() - 1-counter] = true;
-                }
-                counter += 1;
-            }
-            viewable_right_tx.send(set).unwrap();
-        }
+        threads::search_side(viewable_left_tx, left_rx, Direction::Left);
     });
     thread::spawn(move || {
-        loop {
-            let msg = match top_rx.recv().unwrap() {
-                None => {
-                    //msg viewable none and break
-                    viewable_top_tx.send(ViewableMsg::finished_msg(Direction::Top)).unwrap();
-                    break;
-                }
-                Some(msg) => msg,
-            };
-            let mut set = ViewableMsg::new(Direction::Top, msg.len());
-            let mut max = msg[0];
-            set.data[0] = true;
-            let mut counter = 1;
-            for element in msg.iter().skip(1) {
-                if *element > max {
-                    max = *element;
-                    set.data[counter] = true;
-                }
-                counter += 1;
-            }
-            viewable_top_tx.send(set).unwrap();
-        }
+        threads::search_side(viewable_right_tx, right_rx, Direction::Right);
     });
     thread::spawn(move || {
-        loop {
-            let msg = match bottom_rx.recv().unwrap() {
-                None => {
-                    //msg viewable none and break
-                    viewable_bottom_tx.send(ViewableMsg::finished_msg(Direction::Bottom)).unwrap();
-                    break;
-                }
-                Some(msg) => msg,
-            };
-            let mut set = ViewableMsg::new(Direction::Bottom, msg.len());
-            let mut max = msg[msg.len() - 1];
-            set.data[msg.len() - 1] = true;
-            let mut counter = 1;
-            for element in msg.iter().rev().skip(1) {
-                if *element > max {
-                    max = *element;
-                    set.data[msg.len() - 1-counter] = true;
-                }
-                counter += 1;
-            }
-            viewable_bottom_tx.send(set).unwrap();
-        }
+        threads::search_side(viewable_top_tx, top_rx, Direction::Top);
+    });
+    thread::spawn(move || {
+        threads::search_side(viewable_bottom_tx, bottom_rx, Direction::Bottom);
     });
 
     let data_string = read_file_str(input_path);
