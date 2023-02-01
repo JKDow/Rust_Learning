@@ -1,9 +1,8 @@
+pub mod threads;
+
 use crate::read_file_str;
 use std::thread;
 use std::sync::mpsc;
-
-pub mod threads;
-
 use threads::*;
 
 pub fn run(input_path: &str) -> u32 {
@@ -19,98 +18,20 @@ pub fn run(input_path: &str) -> u32 {
     let (main_tx, main_rx) = mpsc::channel::<u32>();
 
     thread::spawn(move || {
-        let mut left = true;
-        let mut right = true;
-        let mut top = true;
-        let mut bottom = true;
-        let mut left_counter = 0;
-        let mut right_counter = 0;
-        let mut top_counter = 0;
-        let mut bottom_counter = 0;
-        let setup_msg = viewable_rx.recv().unwrap();
-        let mut viewable: Vec<Vec<bool>> = vec![vec![false; setup_msg.length]; setup_msg.length];
-        let mut viewable_counter = 0;
-
-        while left || right || top || bottom {
-            let msg = viewable_rx.recv().unwrap();
-            if msg.finished == true {
-                match msg.direction {
-                    Direction::Left => left = false,
-                    Direction::Right => right = false,
-                    Direction::Top => top = false,
-                    Direction::Bottom => bottom = false,
-                }
-                continue;
-            }
-            match msg.direction {
-                Direction::Left => {
-                    let mut counter = 0;
-                    for element in msg.data.iter() {
-                        if *element == true {
-                            if viewable[left_counter][counter] == false {
-                                viewable_counter += 1;
-                                viewable[left_counter][counter] = true;
-                            }
-                        }
-                        counter += 1;
-                    }
-                    left_counter += 1;
-                }
-                Direction::Right => {
-                    let mut counter = 0;
-                    for element in msg.data.iter() {
-                        if *element == true {
-                            if viewable[right_counter][counter] == false {
-                                viewable_counter += 1;
-                                viewable[right_counter][counter] = true;
-                            }
-                        }
-                        counter += 1;
-                    }
-                    right_counter += 1;
-                }
-                Direction::Top => {
-                    let mut counter = 0;
-                    for element in msg.data.iter() {
-                        if *element == true {
-                            if viewable[counter][top_counter] == false {
-                                viewable_counter += 1;
-                                viewable[counter][top_counter] = true;
-                            }
-                        }
-                        counter += 1;
-                    }
-                    top_counter += 1;
-                }
-                Direction::Bottom => {
-                    let mut counter = 0;
-                    for element in msg.data.iter() {
-                        if *element == true {
-                            if viewable[counter][bottom_counter] == false {
-                                viewable_counter += 1;
-                                viewable[counter][bottom_counter] = true;
-                            }
-                        }
-                        counter += 1;
-                    }
-                    bottom_counter += 1;
-                }           
-            }
-        }
-        main_tx.send(viewable_counter).unwrap();
+        update_viewable(main_tx, viewable_rx);
     });
 
     thread::spawn(move || {
-        threads::search_side(viewable_left_tx, left_rx, Direction::Left);
+        search_side(viewable_left_tx, left_rx, Direction::Left);
     });
     thread::spawn(move || {
-        threads::search_side(viewable_right_tx, right_rx, Direction::Right);
+        search_side(viewable_right_tx, right_rx, Direction::Right);
     });
     thread::spawn(move || {
-        threads::search_side(viewable_top_tx, top_rx, Direction::Top);
+        search_side(viewable_top_tx, top_rx, Direction::Top);
     });
     thread::spawn(move || {
-        threads::search_side(viewable_bottom_tx, bottom_rx, Direction::Bottom);
+        search_side(viewable_bottom_tx, bottom_rx, Direction::Bottom);
     });
 
     let data_string = read_file_str(input_path);
@@ -147,7 +68,6 @@ pub fn run(input_path: &str) -> u32 {
 
     return viewable_counter;
 }
-
 #[cfg(test)] 
 mod tests {
     use super::*;
