@@ -1,9 +1,43 @@
 use std::sync::mpsc;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Direction {Left=0, Right=1, Top=2, Bottom=3}
 
-#[derive(Debug)]
+pub struct Message {
+    pub viewable_setup_tx: mpsc::Sender<ViewableMsg>,
+    pub viewable_tx: Vec<mpsc::Sender<ViewableMsg>>,
+    pub viewable_rx: mpsc::Receiver<ViewableMsg>,
+    pub side_tx: Vec<mpsc::Sender<Option<Vec<u32>>>>,
+    pub side_rx: Vec<mpsc::Receiver<Option<Vec<u32>>>>,
+    pub main_tx: mpsc::Sender<u32>,
+    pub main_rx: mpsc::Receiver<u32>,
+}
+
+impl Message {
+    pub fn new() -> Message {
+        let (v_tx, v_rx) = mpsc::channel::<ViewableMsg>();
+        let mut viewable_tx: Vec<mpsc::Sender<ViewableMsg>> = vec![];
+        let mut side_tx: Vec<mpsc::Sender<Option<Vec<u32>>>> = vec![];
+        let mut side_rx: Vec<mpsc::Receiver<Option<Vec<u32>>>> = vec![];
+        for _ in 0..4 {
+            viewable_tx.push(v_tx.clone());
+            let (s_tx, s_rx) = mpsc::channel::<Option<Vec<u32>>>();
+            side_tx.push(s_tx);
+            side_rx.push(s_rx);
+        }
+        let (main_tx, main_rx) = mpsc::channel::<u32>();
+        Message {
+            viewable_setup_tx: v_tx.clone(),
+            viewable_tx: viewable_tx, 
+            viewable_rx: v_rx, 
+            side_tx: side_tx, 
+            side_rx: side_rx, 
+            main_tx: main_tx, 
+            main_rx: main_rx,  
+        }
+    }
+}
+
 pub struct ViewableMsg {
     pub data: Vec<bool>,
     pub direction: Direction,
@@ -39,7 +73,6 @@ pub fn search_side(tx: mpsc::Sender<ViewableMsg>, rx: mpsc::Receiver<Option<Vec<
             }
             Some(msg) => msg,
         };
-
         let mut set = ViewableMsg::new(side.clone(), msg.len());
         match side {
             Direction::Left | Direction::Top => {
@@ -61,7 +94,6 @@ pub fn search_side(tx: mpsc::Sender<ViewableMsg>, rx: mpsc::Receiver<Option<Vec<
                 }
             }
         };
-
         tx.send(set).unwrap();
     }
 }
@@ -72,7 +104,6 @@ pub fn update_viewable(tx: mpsc::Sender<u32>, rx: mpsc::Receiver<ViewableMsg>) {
     let setup_msg = rx.recv().unwrap();
     let mut viewable: Vec<Vec<bool>> = vec![vec![false; setup_msg.length]; setup_msg.length];
     let mut viewable_counter = 0;
-
     while run > 0 {
         let msg = rx.recv().unwrap();
         if msg.finished == true {
@@ -81,10 +112,12 @@ pub fn update_viewable(tx: mpsc::Sender<u32>, rx: mpsc::Receiver<ViewableMsg>) {
         }
         for i in 0..msg.data.len() {
             if msg.data[i] {
-                if match msg.direction {
-                    Direction::Left | Direction::Right => compare_row(&mut viewable, side_counters[msg.direction as usize], i),
-                    Direction::Top | Direction::Bottom => compare_column(&mut viewable, side_counters[msg.direction as usize], i),
-                } { 
+                let comp = match msg.direction {
+                    Direction::Left | Direction::Right => &mut viewable[side_counters[msg.direction as usize]][i],
+                    Direction::Top | Direction::Bottom => &mut viewable[i][side_counters[msg.direction as usize]],
+                };
+                if *comp == false {
+                    *comp = true;
                     viewable_counter += 1;
                 }
             }
@@ -92,26 +125,4 @@ pub fn update_viewable(tx: mpsc::Sender<u32>, rx: mpsc::Receiver<ViewableMsg>) {
         side_counters[msg.direction as usize] += 1;
     }
     tx.send(viewable_counter).unwrap();
-}
-
-fn compare_row(viewable: &mut Vec<Vec<bool>>, counter: usize, index: usize) -> bool {
-    if viewable[counter][index] == false {
-        viewable[counter][index] = true;
-        return true;
-    } 
-    return false;
-}
-
-fn compare_column(viewable: &mut Vec<Vec<bool>>, counter: usize, index: usize) -> bool {
-    if viewable[index][counter] == false {
-        viewable[index][counter] = true;
-        return true;
-    } 
-    return false;
-}
-
-fn display_viewable(viewable: &Vec<Vec<bool>>) {
-    for x in viewable.iter() {
-        println!("{:?}", x);
-    }
 }
