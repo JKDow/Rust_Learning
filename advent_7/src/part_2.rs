@@ -4,7 +4,7 @@ use std::{collections::HashMap};
 
 struct Directory {
     index: usize,
-    name: String,
+
     parent: Option<usize>,
     children: HashMap<String, usize>,
     files: HashMap<String, u32>,
@@ -12,10 +12,9 @@ struct Directory {
 }
 
 impl Directory {
-    fn new(index: usize, name: String, parent: Option<usize>) -> Self {
+    fn new(index: usize, parent: Option<usize>) -> Self {
         let dir = Directory {
             index: index,
-            name: name,
             parent: parent,
             children: HashMap::new(),
             files: HashMap::new(),
@@ -31,7 +30,7 @@ impl Directory {
         }
         //if not then make it
         self.children.insert(name.clone(), index);
-        return Some(Directory::new(index, name, Some(self.index)))
+        return Some(Directory::new(index, Some(self.index)))
     }
 
     fn add_file(&mut self, name: String, size: u32) {
@@ -104,7 +103,7 @@ fn get_children_size(nodes: &Vec<Directory>, index: usize) -> u32 {
 
 pub fn run(path: &str) -> usize {
     let mut nodes = Vec::new();
-    let dir = Directory::new(nodes.len(), String::from("/"), None);
+    let dir = Directory::new(nodes.len(), None);
     nodes.push(dir);
     let mut current_dir = 0;
 

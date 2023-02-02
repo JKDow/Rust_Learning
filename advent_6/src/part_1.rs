@@ -9,7 +9,7 @@ pub fn run(path: &str) -> usize {
     return find_unique_hash(data)
 }
 
-fn find_start(data: String) -> usize {
+fn _find_start(data: String) -> usize {
     let mut set:[char; 4] = [from_digit(0,10).unwrap(); 4]; 
     let mut index = 0; 
     let mut countdown = 0; 
@@ -47,7 +47,7 @@ fn find_start(data: String) -> usize {
     return 0
 }
 
-fn find_unique(data: String) -> usize {
+fn _find_unique(data: String) -> usize {
     let mut letters: HashMap<char, Vec<usize>> = HashMap::new();
     let letters_string = "abcdefghijklmnopqrstuvwxyz"; 
     let mut counter = 0; 
@@ -117,35 +117,35 @@ mod tests {
     #[test]
     fn data_1() {
         let data = String::from("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
-        let result = find_unique(data);
+        let result = _find_unique(data);
         assert_eq!(result, 7)
     }
 
     #[test]
     fn data_2() {
         let data = String::from("bvwbjplbgvbhsrlpgdmjqwftvncz");
-        let result = find_unique(data);
+        let result = _find_unique(data);
         assert_eq!(result, 5)
     }
 
     #[test]
     fn data_3() {
         let data = String::from("nppdvjthqldpwncqszvftbrmjlhg");
-        let result = find_unique(data);
+        let result = _find_unique(data);
         assert_eq!(result, 6)
     }
 
     #[test]
     fn data_4() {
         let data = String::from("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
-        let result = find_unique(data);
+        let result = _find_unique(data);
         assert_eq!(result, 10)
     }
 
     #[test]
     fn data_5() {
         let data = String::from("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
-        let result = find_unique(data);
+        let result = _find_unique(data);
         assert_eq!(result, 11)
     }
 }

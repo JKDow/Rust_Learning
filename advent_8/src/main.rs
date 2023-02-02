@@ -4,7 +4,7 @@ https://adventofcode.com/2022/day/8
 
 Author: Josh Dowling
 Created: 26/1/2023
-Last updated: 30/1/2023 
+Last updated: 2/2/2023 
 */
 
 use advent_8::*;

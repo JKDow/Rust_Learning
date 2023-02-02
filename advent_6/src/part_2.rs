@@ -1,4 +1,3 @@
-use std::char::from_digit;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use crate::read_file_str;
@@ -9,7 +8,7 @@ pub fn run(path: &str) -> usize {
     return find_unique_hash(data)
 }
 
-fn find_unique(data: String) -> usize {
+fn _find_unique(data: String) -> usize {
     let mut letters: HashMap<char, Vec<usize>> = HashMap::new();
     let letters_string = "abcdefghijklmnopqrstuvwxyz"; 
     let mut counter = 0; 
