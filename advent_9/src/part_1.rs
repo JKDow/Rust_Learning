@@ -63,10 +63,8 @@ impl Sub for Point {
 pub fn run(input: &str) -> usize {
     let data_string = read_file_str(input);
     let mut visited: HashSet<Point> = HashSet::new();
-
     let mut head = Point::new(0, 0);
     let mut tail = Point::new(0, 0);
-
     visited.insert(tail.clone());
 
     for line in data_string.lines() {
