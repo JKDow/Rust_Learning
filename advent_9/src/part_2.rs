@@ -80,14 +80,16 @@ struct Knot {
     coords: Coordinate,
     last_move: Option<Direction>,
     leader_position: Option<Direction>,
+    follow: Option<usize>,
 }
 
 impl Knot {
-    fn new(x: i32, y:i32) -> Knot {
+    fn new(x: i32, y:i32, follow: Option<usize>) -> Knot {
         Knot {
             coords: Coordinate { x: x, y: y },
             last_move: None, 
-            leader_position: None 
+            leader_position: None ,
+            follow: follow,
         }
     }
 
@@ -206,9 +208,13 @@ pub fn run(input: &str) -> usize {
 
     let mut visited: HashSet<Coordinate> = HashSet::new();
 
-    let mut head = Knot::new(0, 0);
-    let mut tail = Knot::new(0, 0);
-    visited.insert(tail.coords.clone());
+    let mut knots: Vec<Knot> = Vec::new();
+
+    knots.push(Knot::new(0, 0, None));
+    for i in 0..9 {
+        knots.push(Knot::new(0, 0, Some(i)));
+    } 
+    visited.insert(knots[9].coords.clone());
 
     for line in data_string.lines() {
         let dir = line
@@ -219,9 +225,12 @@ pub fn run(input: &str) -> usize {
             .nth(1).unwrap()
             .parse().unwrap();
         for _ in 0..steps {
-            head.move_direction(Direction::from_str(dir).unwrap());
-            tail.follow_leader(&head);
-            visited.insert(tail.coords.clone());
+            knots[0].move_direction(Direction::from_str(dir).unwrap());
+            for i in 1..=9 {
+                let leader = knots[knots[i].follow.unwrap()].clone();
+                knots[i].follow_leader(&leader);
+            } 
+            visited.insert(knots[9].coords.clone());
         }
     }
     return visited.len();
@@ -233,7 +242,7 @@ mod tests {
 
     #[test]
     fn data_1() {
-        let result = run("input_test.txt");
-        assert_eq!(result, 13)
+        let result = run("input_test2.txt");
+        assert_eq!(result, 36)
     }
 }
