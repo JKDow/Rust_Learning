@@ -7,4 +7,8 @@ Has:
     - User input 
     - Random number gen
     - Checking using match and compare 
-    
+
+## Advent of Code
+The other projects are solutions to the 2022 advent of code 
+
+These were used to help learn the rust programming langauge 
